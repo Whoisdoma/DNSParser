@@ -124,16 +124,22 @@ class DNSParser {
     {
 
         $this->Result = new Result();
-        
+
         try {
             if ($query == '') {
                 throw new NoQueryException('No lookup query given');
             }
+
+            $this->Result->addItem('success', true);
+
+
+
         } catch (AbstractException $e) {
             if ($this->throwExceptions) {
                 throw $e;
             }
 
+            $this->Result->addItem('success', false);
             $this->Result->addItem('exception', $e->getMessage());
         }
 
