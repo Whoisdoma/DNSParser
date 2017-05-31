@@ -139,7 +139,7 @@ class DNSParser {
             }
 
             $this->Query->domain = $query;
-            
+
 
         } catch (AbstractException $e) {
             if ($this->throwExceptions) {
