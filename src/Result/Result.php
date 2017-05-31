@@ -69,7 +69,6 @@ class Result extends AbstractResult {
     {
         $this->authns = new \stdClass();
         $this->soa = new \stdClass();
-        $this->lastId = -1;
     }
 
     /**
@@ -96,6 +95,8 @@ class Result extends AbstractResult {
             return;
         }
 
+
+
         if ($append && isset($this->{$target})) {
             if (!is_array($this->{$target})) {
                 $this->{$target} = array($this->{$target});
@@ -121,7 +122,6 @@ class Result extends AbstractResult {
         // add items again
         $this->authns = new \stdClass();
         $this->soa = new \stdClass();
-        $this->lastId = - 1;
     }
 
     /**

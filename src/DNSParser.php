@@ -18,6 +18,14 @@ class DNSParser {
     protected $Result;
 
     /**
+     * Query string sent to the DNSParser
+     *
+     * @var object
+     * @access protected
+     */
+    protected $Query;
+
+    /**
      * Should the exceptions be thrown or caugth and trapped in the response?
      *
      * @var boolean
@@ -130,9 +138,8 @@ class DNSParser {
                 throw new NoQueryException('No lookup query given');
             }
 
-            $this->Result->addItem('success', true);
-
-
+            $this->Query->domain = $query;
+            
 
         } catch (AbstractException $e) {
             if ($this->throwExceptions) {
@@ -141,6 +148,13 @@ class DNSParser {
 
             $this->Result->addItem('success', false);
             $this->Result->addItem('exception', $e->getMessage());
+
+            if (isset($this->Query)) {
+                $this->Result->addItem("domain", $this->Query->domain);
+            } else {
+                $this->Result->addItem("domain", $query);
+            }
+
         }
 
 
