@@ -1,0 +1,24 @@
+{
+  "name": "whoisdoma/dnsparser",
+  "type": "library",
+  "description": "Preferm DNS lookups for domains",
+  "keywords": [
+    "dnsparser",
+    "whois",
+    "domain dns",
+    "dns",
+    "php"
+  ],
+  "homepage": "https://github.com/Whoisdoma/DNSParser/",
+  "author": "XAOS Interactive",
+  "license": "MIT",
+  "require": {
+    "whoisdoma/domainparser": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Whoisdoma\\DNSParser\\": "src/"
+    }
+  },
+  "version": "1.0.0"
+}
