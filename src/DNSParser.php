@@ -2,9 +2,12 @@
 
 namespace Whoisdoma\DNSParser;
 
+use Whoisdoma\DNSParser\Helpers\Utils;
+use Whoisdoma\DNSParser\Result\AuthNSRecord;
 use Whoisdoma\DNSParser\Result\Result;
 use Whoisdoma\DNSParser\Exception\AbstractException;
 use Whoisdoma\DNSParser\Exception\NoQueryException;
+use Whoisdoma\DNSParser\Result\SOARecord;
 
 class DNSParser {
 
@@ -63,6 +66,7 @@ class DNSParser {
      */
     public function __construct($format = 'object')
     {
+        $this->Query = new \stdClass();
         $this->setFormat($format);
     }
 
@@ -130,7 +134,6 @@ class DNSParser {
 
     public function lookup($query = '')
     {
-
         $this->Result = new Result();
 
         try {
@@ -138,8 +141,12 @@ class DNSParser {
                 throw new NoQueryException('No lookup query given');
             }
 
-            $this->Query->domain = $query;
-
+            $this->Result->addItem('success', true);
+            $this->Result->addItem('domain', $query);
+            $this->Result->addItem('ip', Utils::getIP($query));
+            $this->Result->addItem('authns', $this->Result->getAuthNS($query));
+            $this->Result->addItem('soa', $this->Result->getSOARecord($query));
+            $this->Result->addItem('records', Utils::getallRecords($query));
 
         } catch (AbstractException $e) {
             if ($this->throwExceptions) {
@@ -148,12 +155,6 @@ class DNSParser {
 
             $this->Result->addItem('success', false);
             $this->Result->addItem('exception', $e->getMessage());
-
-            if (isset($this->Query)) {
-                $this->Result->addItem("domain", $this->Query->domain);
-            } else {
-                $this->Result->addItem("domain", $query);
-            }
 
         }
 
@@ -176,5 +177,60 @@ class DNSParser {
                 return $this->Result;
         }
     }
+
+    public function getSOA($query = '')
+    {
+        $this->Result = new SOARecord();
+
+        try {
+            if ($query == '') {
+                throw new NoQueryException('No lookup query given');
+            }
+
+            //get the soa dns record
+            $soaData = dns_get_record($query, DNS_SOA);
+
+            foreach($soaData as $soaInfo) {
+
+                $this->Result->addItem('nameserver', $soaInfo['mname']);
+                $this->Result->addItem('email', $soaInfo['rname']);
+                $this->Result->addItem('serial', $soaInfo['serial']);
+                $this->Result->addItem('refresh', $soaInfo['refresh']);
+                $this->Result->addItem('retry', $soaInfo['retry']);
+                $this->Result->addItem('expiry', $soaInfo['expire']);
+                $this->Result->addItem('minimum', $soaInfo['minimum-ttl']);
+
+            }
+
+        } catch (AbstractException $e) {
+            if ($this->throwExceptions) {
+                throw $e;
+            }
+
+            $this->Result->addItem('success', false);
+            $this->Result->addItem('exception', $e->getMessage());
+
+        }
+
+
+        // peparing output of Result by format
+        switch ($this->format) {
+            case 'json':
+                return $this->Result->toJson();
+                break;
+            case 'serialize':
+                return $this->Result->serialize();
+                break;
+            case 'array':
+                return $this->Result->toArray();
+                break;
+            case 'xml':
+                return $this->Result->toXml();
+                break;
+            default:
+                return $this->Result;
+        }
+    }
+
 
 }
