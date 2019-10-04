@@ -20,7 +20,7 @@ class Utils {
     public static function getallRecords($query) {
 
         //assign a variable for the dns lookup
-        $dnsData = dns_get_record($query, DNS_ALL);
+        $dnsData = dns_get_record($query, DNS_ANY);
 
         //return the dns results
         return $dnsData;
